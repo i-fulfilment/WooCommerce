@@ -1,4 +1,4 @@
-WooCommerce Integration For I-Fulfilment
+I-Fulfilment WooCommerce Integration
 =================
 
 A Blade IMS Wordpress plugin for WooCommerce Stores.
