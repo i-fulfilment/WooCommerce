@@ -15,7 +15,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 // Register new status
-function create_new_order_statuses() {
+function ifl_create_new_order_statuses() {
 
     // Create the status that gets set when blade picks up the order for the first time
     register_post_status( 'wc-blade-processing', array(
@@ -58,10 +58,10 @@ function create_new_order_statuses() {
     ) );
 }
 
-add_action( 'init', 'create_new_order_statuses' );
+add_action( 'init', 'ifl_create_new_order_statuses' );
 
 // Add to list of WC Order statuses
-function load_new_order_statuses( $order_statuses ) {
+function ifl_load_new_order_statuses( $order_statuses ) {
 
     $new_order_statuses = array();
 
@@ -85,4 +85,4 @@ function load_new_order_statuses( $order_statuses ) {
 
     return $new_order_statuses;
 }
-add_filter( 'wc_order_statuses', 'load_new_order_statuses' );
+add_filter( 'wc_order_statuses', 'ifl_load_new_order_statuses' );
