@@ -6,13 +6,16 @@
  * Author: I-Fulfilment - Edward Marriner - support.team@i-fulfilment.co.uk
  * Author URI: http://www.i-fulfilment.co.uk/
  * Version: 1.0
- * Text Domain: blade-fulfilment
+ * Text Domain: ifulfilment
  *
  * Copyright: (c) 2014 I-Fulfilment, Inc.
  *
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+if( !class_exists( 'WP_Http' ) )
+    include_once( ABSPATH . WPINC. '/class-http.php' );
 
 // Register new status
 function ifl_create_new_order_statuses() {
@@ -45,8 +48,8 @@ function ifl_create_new_order_statuses() {
         'show_in_admin_all_list'    => true,
         'show_in_admin_status_list' => true,
         'label_count'               => _n_noop( 'Packed, Awaiting Despatch <span class="count">(%s)</span>', 'Packed, Awaiting Despatch <span class="count">(%s)</span>' )
-    ) );    
-    
+    ) );
+
     // Create the packed status
     register_post_status( 'wc-blade-despatched', array(
         'label'                     => 'Despatched',
@@ -73,16 +76,170 @@ function ifl_load_new_order_statuses( $order_statuses ) {
         // Rename the default order status 'Processing' to say 'Waiting for fulfilment' to make it clearer.
         if ( 'wc-processing' === $key && $status == 'Processing') {
 
-                 $new_order_statuses['wc-processing'] = 'Waiting For Fulfilment';
+		 $new_order_statuses['wc-processing'] = 'Waiting For Fulfilment';
 
-                // Add the new order statuses
-                 $new_order_statuses['wc-blade-processing']              = 'Pulling Order Into Blade IMS';
-                 $new_order_statuses['wc-blade-picking']                 = 'Items Awaiting Picking';
-                 $new_order_statuses['wc-blade-packed']                  = 'Items Packed, Awaiting Order Despatch';
-                 $new_order_statuses['wc-blade-despatched']              = 'Order Despatched';
-        }
+		// Add the new order statuses
+       		 $new_order_statuses['wc-blade-processing']        = 'Pulling Order Into Blade IMS';
+       		 $new_order_statuses['wc-blade-picking']		    = 'Items Awaiting Picking';
+       		 $new_order_statuses['wc-blade-packed']			  =  'Items Packed, Awaiting Order Despatch';
+       		 $new_order_statuses['wc-blade-despatched']		= 'Order Despatched';
+	  }
     }
 
     return $new_order_statuses;
 }
+
+
 add_filter( 'wc_order_statuses', 'ifl_load_new_order_statuses' );
+
+add_action( 'admin_menu', 'ifl_register_menu_page' );
+
+function ifl_register_menu_page(){
+
+    // Check they have woo commerce installed already!
+    if ( !is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+
+        // Opps, they dont have WooCommerce!
+        add_menu_page( 'I-Fulfilment Integration', 'I-Fulfilment', 'manage_options', 'ifulfilment/error.php', '', '', 55.5 );
+
+        return;
+    }
+
+    if ( current_user_can( 'manage_woocommerce' ) ):
+
+    $shipping_methods = WC()->shipping->load_shipping_methods();
+
+    $shipping = array(
+        'standard' => array(
+            'enabled' => ($shipping_methods['flat_rate']->enabled == 'yes') ? true : false,
+            'id' => $shipping_methods['flat_rate']->id,
+        ),
+        'free' => array(
+            'enabled' => ($shipping_methods['free_shipping']->enabled == 'yes') ? true : false,
+            'id' => $shipping_methods['free_shipping']->id
+        ),
+        'international' => array(
+            'enabled' =>($shipping_methods['international_delivery']->enabled == 'yes') ? true : false,
+            'id' => $shipping_methods['international_delivery']->id
+        ),
+        'local' => array(
+            'enabled' => ($shipping_methods['local_delivery']->enabled == 'yes') ? true : false,
+            'id' => $shipping_methods['local_delivery']->id
+        ),
+        'pickup' => array(
+            'enabled' => ($shipping_methods['local_pickup']->enabled == 'yes') ? true : false,
+            'id' => $shipping_methods['local_pickup']->id
+        )
+    );
+
+    update_option('ifl_shipping_overview', $shipping ); // We dont allow local pickup!
+
+    // Grab the various WooCommerce order statuses
+    $order_statuses = wc_get_order_statuses();
+
+    // Defaults
+    $key = 'NOT_SET';
+    $secret = 'NOT_SET';
+
+    // Loop over all the users to find the API key account
+    foreach(get_users() as $user){
+
+        // Check this user has WooCommerce details
+        if($user->allcaps['manage_woocommerce'] == true) {
+
+            $key = get_user_meta($user->data->ID, 'woocommerce_api_consumer_key');
+            $secret = get_user_meta($user->data->ID, 'woocommerce_api_consumer_secret');
+
+            // See if we found the details
+            if($key && $secret) {
+
+                    // We did! Lets break out of the loop now.
+                    break;
+            }
+        }
+    }
+
+    // Check we are all good on the woocommerce front!
+    if(get_option('woocommerce_api_enabled') != 'yes'){
+
+        update_option('ifl_woocommerce_status', 'API Disabled');    // No WooCommerce API!
+
+    } elseif(get_option('woocommerce_version') < 2.2) {
+
+        update_option('ifl_woocommerce_status', 'WooCommerce' . get_option('woocommerce_version') ); // WooCommerce Too Old!
+
+    } elseif(empty($key)) {
+
+        update_option('ifl_woocommerce_status', 'No API Key' ); // API not setup
+
+    } elseif(empty($secret)) {
+
+        update_option('ifl_woocommerce_status', 'No API Token' ); // API not set up!
+
+    } elseif(empty($order_statuses)) {
+
+        update_option('ifl_woocommerce_status', 'No Order Statuses' ); // WooCommerce Too Old!
+
+    } elseif( $shipping['pickup']['enabled'] || $shipping['local']['enabled']) {
+
+        update_option('ifl_woocommerce_status', 'Invalid Shipping Methods' ); // We dont allow local pickup!
+
+    } elseif( !$shipping['standard']['enabled'] && !$shipping['free']['enabled'] && !$shipping['international']['enabled']) {
+
+        update_option('ifl_woocommerce_status', 'No Valid Shipping Methods' ); // We dont allow local pickup!
+
+    } else {
+
+        update_option('ifl_woocommerce_status', 'Good' );    // Seems to be fine!
+
+    }
+
+    // Check wordpress is all okay!
+    if(get_bloginfo('version') < 4 || get_bloginfo('version') >= 5){
+
+        update_option('ifl_health_check', 'Unsupported Wordpress version (' . get_bloginfo('version') . ')');    // No WooCommerce API!
+
+    } else {
+
+        update_option('ifl_health_check', 'Good' );    // WooCommerce Too Old!
+
+    }
+
+    // Check our integration is working okay!
+    if(empty($order_statuses['wc-blade-processing'])){
+
+        update_option('ifl_integration_status', 'Missing Processing Status');    // No WooCommerce API!
+
+    } elseif(empty($order_statuses['wc-blade-picking'])){
+
+        update_option('ifl_integration_status', 'Missing Picking Status');    // No WooCommerce API!
+
+    } elseif(empty($order_statuses['wc-blade-packed'])){
+
+        update_option('ifl_integration_status', 'Missing Packed Status');    // No WooCommerce API!
+
+    } elseif(empty($order_statuses['wc-blade-despatched'])){
+
+        update_option('ifl_integration_status', 'Missing Despatched Status');    // No WooCommerce API!
+
+    } else {
+
+        update_option('ifl_integration_status',  'Good');    // WooCommerce Too Old!
+
+    }
+
+
+    add_menu_page( 'I-Fulfilment Integration', 'I-Fulfilment', 'manage_options', 'ifulfilment/admin.php', '', '', 55.5 );
+
+    function ifl_plugin_activate() {
+
+        $request = new WP_Http;
+        $request->request( 'https://bdes.i-fulfilment.co.uk/woo_commerce/Install/register/' . urlencode(get_site_url()));
+
+    }
+
+    register_activation_hook( __FILE__, 'ifl_plugin_activate' );
+
+    endif;
+
+}
