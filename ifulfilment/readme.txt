@@ -31,5 +31,10 @@ Our proprietary fulfilment software "BLADE IMS" integrates with the majority of 
 
 == Changelog ==
 
+= 2.0 =
+* Plugin submission into the Wordpress Repo
+* Admin settings panel
+* Better WooCommerce compatibility
+
 = 1.0 =
 * Initial launch
