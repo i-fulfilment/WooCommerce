@@ -1,9 +1,9 @@
-=== I-Fulfilment Integration ===
-Tags: fulfilment, orders, woocommerce, shipping, store, ecommerce
+=== WooCommerce I-Fulfilment Integration ===
+Tags: fulfilment, orders, woocommerce, shipping, store, ecommerce, fulfillment, delivery, royal mail, dhl, ups, shop, selling, e-commerce, sales, woo commerce, woo-commerce
 Requires at least: 3.0.1
 Contributors: i-fulfilment
-Tested up to: 3.4
-Stable tag: 4.3
+Tested up to: 4.0
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,11 +25,20 @@ Our proprietary fulfilment software "BLADE IMS" integrates with the majority of 
 
 == Installation ==
 
-1. Upload the `blade` folder to the `/wp-content/plugins/` directory
+1. Upload the `ifulfilment` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
 
 == Changelog ==
+
+= 2.0.3 =
+* Misspelling in support details
+
+= 2.0.2 =
+* Fixed small issue with URL slug
+
+= 2.0.1 =
+* Fixed folder structure for Wordpress plugin directory
 
 = 2.0 =
 * Plugin submission into the Wordpress Repo

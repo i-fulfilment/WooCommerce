@@ -38,7 +38,7 @@
 						<div class="inside" style=" /* background: red; */ ">
 							<div class="main" style=" margin-top: 47px; color: #fff; ">
 								<div style="width:50%; border-right: 1px solid #FFAE77;height: 171px;box-sizing: border-box;float: left;/* padding-left: 10px; */text-align: center;">
-									<h2 style=" color: #fff; font-weight: bold; font-size: 30px; ">Techincal Support</h2>
+									<h2 style=" color: #fff; font-weight: bold; font-size: 30px; ">Technical Support</h2>
 									<div style=" margin-top: 40px; ">
 										<b>Call us:</b> +44 (01425) 200 210
 									</div>

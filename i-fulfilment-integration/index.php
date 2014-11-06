@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: I-Fulfilment Integration
+ * Plugin Name: WooCommerce I-Fulfilment Integration
  * Plugin URI: http://www.i-fulfilment.co.uk/
  * Description: Enables the WooCommerce I-Fulfilment integration with Blade IMS.
- * Author: I-Fulfilment - Edward Marriner - support.team@i-fulfilment.co.uk
+ * Author: I-Fulfilment - Developer Team - support.team@i-fulfilment.co.uk
  * Author URI: http://www.i-fulfilment.co.uk/
- * Version: 1.0
- * Text Domain: ifulfilment
+ * Version: 2.0.3
+ * Text Domain: i-fulfilment-integration
  *
  * Copyright: (c) 2014 I-Fulfilment, Inc.
  *
@@ -100,7 +100,7 @@ function ifl_register_menu_page(){
     if ( !is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 
         // Opps, they dont have WooCommerce!
-        add_menu_page( 'I-Fulfilment Integration', 'I-Fulfilment', 'manage_options', 'ifulfilment/error.php', '', '', 55.5 );
+        add_menu_page( 'I-Fulfilment Integration', 'I-Fulfilment', 'manage_options', 'i-fulfilment-integration/error.php', '', '', 55.5 );
 
         return;
     }
@@ -229,7 +229,7 @@ function ifl_register_menu_page(){
     }
 
 
-    add_menu_page( 'I-Fulfilment Integration', 'I-Fulfilment', 'manage_options', 'ifulfilment/admin.php', '', '', 55.5 );
+    add_menu_page( 'I-Fulfilment Integration', 'I-Fulfilment', 'manage_options', 'i-fulfilment-integration/admin.php', '', '', 55.5 );
 
     function ifl_plugin_activate() {
 
