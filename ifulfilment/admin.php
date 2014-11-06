@@ -149,7 +149,7 @@
 											'ifl_integration_status' => get_option('ifl_integration_status'),
 											'ifl_health_check' => get_option('ifl_health_check'),
 										),
-										'shipping_methods' => $shipping,
+										'shipping_methods' => get_option('ifl_shipping_overview'),
 										'order_statuses' => $order_statuses,
 										'store' => array(
 											'plugins' => get_option('active_plugins'),
