@@ -145,7 +145,7 @@ function ifl_register_menu_page(){
     foreach(get_users() as $user){
 
         // Check this user has WooCommerce details
-        if($user->allcaps['manage_woocommerce'] == true) {
+        if(isset($user->allcaps['manage_woocommerce']) && $user->allcaps['manage_woocommerce'] == true) {
 
             $key = get_user_meta($user->data->ID, 'woocommerce_api_consumer_key');
             $secret = get_user_meta($user->data->ID, 'woocommerce_api_consumer_secret');
