@@ -111,24 +111,24 @@ function ifl_register_menu_page(){
 
     $shipping = array(
         'standard' => array(
-            'enabled' => ($shipping_methods['flat_rate']->enabled == 'yes') ? true : false,
-            'id' => $shipping_methods['flat_rate']->id,
+            'enabled' => isset($shipping_methods['flat_rate']) && ($shipping_methods['flat_rate']->enabled == 'yes') ? true : false,
+            'id' => isset($shipping_methods['flat_rate']) ? $shipping_methods['flat_rate']->id : 0,
         ),
         'free' => array(
-            'enabled' => ($shipping_methods['free_shipping']->enabled == 'yes') ? true : false,
-            'id' => $shipping_methods['free_shipping']->id
+            'enabled' => isset($shipping_methods['free_shipping']) && ($shipping_methods['free_shipping']->enabled == 'yes') ? true : false,
+            'id' => isset($shipping_methods['free_shipping']) ? $shipping_methods['free_shipping']->id : 0,
         ),
         'international' => array(
-            'enabled' =>($shipping_methods['international_delivery']->enabled == 'yes') ? true : false,
-            'id' => $shipping_methods['international_delivery']->id
+            'enabled' => isset($shipping_methods['international_delivery']) && ($shipping_methods['international_delivery']->enabled == 'yes') ? true : false,
+            'id' => isset($shipping_methods['international_delivery']) ? $shipping_methods['international_delivery']->id : 0
         ),
         'local' => array(
-            'enabled' => ($shipping_methods['local_delivery']->enabled == 'yes') ? true : false,
-            'id' => $shipping_methods['local_delivery']->id
+            'enabled' => isset($shipping_methods['local_delivery']) && ($shipping_methods['local_delivery']->enabled == 'yes') ? true : false,
+            'id' => isset($shipping_methods['local_delivery']) ? $shipping_methods['local_delivery']->id : 0
         ),
         'pickup' => array(
-            'enabled' => ($shipping_methods['local_pickup']->enabled == 'yes') ? true : false,
-            'id' => $shipping_methods['local_pickup']->id
+            'enabled' => isset($shipping_methods['local_pickup']) && ($shipping_methods['local_pickup']->enabled == 'yes') ? true : false,
+            'id' => isset($shipping_methods['local_pickup']) ? $shipping_methods['local_pickup']->id : 0
         )
     );
 
@@ -145,17 +145,13 @@ function ifl_register_menu_page(){
     foreach(get_users() as $user){
 
         // Check this user has WooCommerce details
-        if(isset($user->allcaps['manage_woocommerce']) && $user->allcaps['manage_woocommerce'] == true) {
+        if($user->has_caps('manage_woocommerce')) {
 
             $key = get_user_meta($user->data->ID, 'woocommerce_api_consumer_key');
             $secret = get_user_meta($user->data->ID, 'woocommerce_api_consumer_secret');
 
-            // See if we found the details
-            if($key && $secret) {
-
-                    // We did! Lets break out of the loop now.
-                    break;
-            }
+            // Lets break out of the loop now if we found the details
+            if($key && $secret)  break;
         }
     }
 
